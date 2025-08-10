@@ -10,7 +10,7 @@ class CepRepository {
   CepRepository({required this.client});
 
   Future<CepModel> consultarCep(String cep) async {
-    final cleanCep = cep.replaceAll(r'[^0-9]', '');
+    final cleanCep = cep.replaceAll(RegExp(r'[^0-9]'), '');
     if (cleanCep.length != 8) {
       throw Exception('CEP deve conter exatamente 8 dígitos');
     }
