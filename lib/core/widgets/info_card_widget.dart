@@ -2,7 +2,18 @@ import 'package:busca_cep_app/core/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 
 class InfoCardWidget extends StatelessWidget {
-  const InfoCardWidget({super.key});
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+
+  const InfoCardWidget({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,13 +24,13 @@ class InfoCardWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(
-          color: Colors.black.withValues(alpha: 0.2),
+          color: color.withValues(alpha: 0.2),
           width: 1.0,
         ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: color.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -30,12 +41,12 @@ class InfoCardWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
-              Icons.home,
-              color: Colors.red,
+              icon,
+              color: color,
               size: 24,
             ),
           ),
@@ -45,14 +56,14 @@ class InfoCardWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CustomText(
-                  'CEP',
+                  title,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: Colors.red,
+                    color: color,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 CustomText(
-                  '12345-678',
+                  subtitle,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w500,
                   ),

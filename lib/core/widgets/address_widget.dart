@@ -1,13 +1,20 @@
 import 'package:busca_cep_app/core/widgets/custom_text.dart';
 import 'package:busca_cep_app/core/widgets/info_card_widget.dart';
+import 'package:busca_cep_app/models/cep_model.dart';
 import 'package:flutter/material.dart';
 
 class AddressWidget extends StatelessWidget {
-  const AddressWidget({super.key});
+  final CepModel? cepModel;
+
+  const AddressWidget({super.key, this.cepModel});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    if (cepModel == null) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       children: [
@@ -47,16 +54,44 @@ class AddressWidget extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        InfoCardWidget(),
-        InfoCardWidget(),
-        InfoCardWidget(),
-        InfoCardWidget(),
-        InfoCardWidget(),
-        InfoCardWidget(),
-        InfoCardWidget(),
-        InfoCardWidget(),
-        InfoCardWidget(),
-        InfoCardWidget(),
+        InfoCardWidget(
+          icon: Icons.location_on_rounded,
+          title: 'CEP',
+          subtitle: cepModel!.cep,
+          color: theme.colorScheme.primary,
+        ),
+        InfoCardWidget(
+          icon: Icons.streetview_rounded,
+          title: 'Logradouro',
+          subtitle: cepModel!.logradouro,
+          color: theme.colorScheme.secondary,
+        ),
+        InfoCardWidget(
+          icon: Icons.home_rounded,
+          title: 'Bairro',
+          subtitle: cepModel!.bairro,
+          color: theme.colorScheme.tertiary,
+        ),
+        InfoCardWidget(
+          icon: Icons.location_city_rounded,
+          title: 'Cidade',
+          subtitle: cepModel!.localidade,
+          color: Color(0xff10b981),
+        ),
+        InfoCardWidget(
+          icon: Icons.map_rounded,
+          title: 'Estado',
+          subtitle: cepModel!.uf,
+          color: Colors.orange,
+        ),
+
+        if (cepModel!.complemento.isNotEmpty)
+          InfoCardWidget(
+            icon: Icons.info_rounded,
+            title: 'Complemento',
+            subtitle: cepModel!.complemento,
+            color: Colors.purple,
+          ),
       ],
     );
   }

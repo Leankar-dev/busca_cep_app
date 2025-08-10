@@ -21,7 +21,7 @@ class CepRepository {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        if (jsonData.containKey('erro')) {
+        if (jsonData.containsKey('erro') && jsonData['erro'] == true) {
           throw Exception('CEP não encontrado');
         }
         return CepModel.fromJson(jsonData);

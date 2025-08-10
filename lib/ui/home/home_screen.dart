@@ -1,8 +1,9 @@
 import 'package:busca_cep_app/core/widgets/address_widget.dart';
-import 'package:busca_cep_app/core/widgets/custom_elevated_buttom_icon.dart';
 import 'package:busca_cep_app/core/widgets/custom_text.dart';
-import 'package:busca_cep_app/core/widgets/custom_text_field.dart';
+import 'package:busca_cep_app/models/cep_model.dart';
+import 'package:busca_cep_app/repositories/cep_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +13,46 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final repository = CepRepository(client: http.Client());
+  final cepController = TextEditingController();
+  String? errorMessage;
+  CepModel? cepModel;
+
+  Future<void> buscarCep() async {
+    setState(() {
+      errorMessage = null;
+      cepModel = null;
+    });
+    final cep = cepController.text.trim();
+    if (cep.isEmpty) {
+      setState(() {
+        errorMessage = 'Por favor, insira um CEP válido.';
+      });
+      return;
+    }
+    try {
+      final addressModel = await repository.consultarCep(cep);
+      setState(() {
+        cepModel = addressModel;
+        errorMessage = null;
+      });
+    } on Exception catch (e) {
+      setState(() {
+        errorMessage = 'Erro ao buscar CEP';
+        // errorMessage = 'Erro ao buscar CEP: ${e.toString()}';
+      });
+    } finally {
+      cepController.clear();
+      FocusScope.of(context).unfocus(); // Remove o foco do campo de texto
+    }
+  }
+
+  @override
+  void dispose() {
+    cepController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // para pegar o thema da App como um todo
@@ -71,27 +112,66 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            CustomTextField(
+            TextField(
+              controller: cepController,
               keyboardType: TextInputType.number,
               maxLength: 9,
-              prefixIcon: Icon(
-                Icons.location_on_rounded,
-                color: theme.colorScheme.primary,
+              decoration: InputDecoration(
+                prefixIcon: Icon(
+                  Icons.location_on_rounded,
+                  color: theme.colorScheme.primary,
+                ),
+                labelText: 'CEP',
+                hintText: 'Ex: 12345-678',
               ),
-              labelText: 'CEP',
-              hintText: 'Ex: 12345-678',
             ),
             const SizedBox(height: 16),
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              child: CustomElevatedButtonIcon(
-                onPressed: () {},
+              child: ElevatedButton.icon(
+                onPressed: buscarCep,
                 icon: const Icon(Icons.search_rounded),
                 label: const CustomText('Buscar CEP'),
               ),
             ),
             const SizedBox(height: 24),
-            AddressWidget(),
+            Visibility(
+              visible: errorMessage != null,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.error.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: theme.colorScheme.error.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.error_outline_rounded,
+                      color: theme.colorScheme.error,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    CustomText(
+                      errorMessage ?? '',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.error,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Visibility(
+              visible: cepModel != null,
+              child: AddressWidget(
+                cepModel: cepModel,
+              ),
+            ),
           ],
         ),
       ),
